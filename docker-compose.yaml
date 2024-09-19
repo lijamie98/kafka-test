@@ -13,9 +13,9 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "29092:29092"
-      - "29093:29093"
-      - "29094:29094"
+      - "9092:9092"
+      - "9093:9093"
+      - "9094:9094"
     environment:
       # Zookeeper
       ZOOKEEPER_SASL_ENABLED: "false"

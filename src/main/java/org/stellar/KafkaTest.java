@@ -16,7 +16,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 public class KafkaTest {
   public static Properties getKafkaProperties() {
     Properties props = new Properties();
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:29092");
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
     props.put(
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.StringSerializer");
@@ -47,13 +47,6 @@ public class KafkaTest {
     props.put(
         "sasl.jaas.config",
         "org.apache.kafka.common.security.plain.PlainLoginModule required username='admin' password='admin-secret';");
-
-    props
-        .entrySet()
-        .forEach(
-            entry -> {
-              System.out.println(entry.getKey() + " = " + entry.getValue());
-            });
 
     return props;
   }
