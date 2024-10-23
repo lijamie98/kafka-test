@@ -6,58 +6,20 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-public class KafkaTest {
-  public static Properties getKafkaProperties() {
-    Properties props = new Properties();
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-    props.put(
-        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.StringSerializer");
-    props.put(
-        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.StringSerializer");
-    props.put(
-        ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.StringDeserializer");
-    props.put(
-        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.StringDeserializer");
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group");
+public abstract class KafkaTest {
+  public abstract Properties getKafkaProperties();
 
-    // SSL settings
-    props.put("ssl.keystore.location", "./secrets/kafka.keystore.jks");
-    props.put("ssl.truststore.location", "./secrets/kafka.truststore.jks");
-
-    props.put("ssl.keystore.password", "test123");
-    props.put("ssl.key.password", "test123");
-    props.put("ssl.truststore.password", "test123");
-
-    // SASL settings
-    props.put("sasl.mechanism", "PLAIN");
-
-    // SASL/SSL Configurations
-    props.put("security.protocol", "SASL_SSL");
-    props.put(
-        "sasl.jaas.config",
-        "org.apache.kafka.common.security.plain.PlainLoginModule required username='admin' password='admin-secret';");
-
-    return props;
-  }
-
-  public static KafkaProducer<String, String> createProducer() {
+  public KafkaProducer<String, String> createProducer() {
     Properties props = getKafkaProperties();
     return new KafkaProducer<>(props);
   }
 
-  public static void createKafkaTopic(
-      String topicName, int numPartitions, short replicationFactor) {
+  public void createKafkaTopic(String topicName, int numPartitions, short replicationFactor) {
     Properties props = getKafkaProperties();
 
     // Create Kafka Admin Client
@@ -75,7 +37,7 @@ public class KafkaTest {
     }
   }
 
-  public static void sendMessages(KafkaProducer<String, String> producer, String topic) {
+  public void sendMessages(KafkaProducer<String, String> producer, String topic) {
     ProducerRecord<String, String> record = new ProducerRecord<>(topic, "key", "value");
     producer.send(
         record,
@@ -95,12 +57,12 @@ public class KafkaTest {
     producer.close();
   }
 
-  public static KafkaConsumer<String, String> createConsumer() {
+  public KafkaConsumer<String, String> createConsumer() {
     Properties props = getKafkaProperties();
     return new KafkaConsumer<>(props);
   }
 
-  public static void consumeMessages(KafkaConsumer<String, String> consumer, String topic) {
+  public void consumeMessages(KafkaConsumer<String, String> consumer, String topic) {
     consumer.subscribe(Arrays.asList(topic));
     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
     records.forEach(
@@ -119,8 +81,9 @@ public class KafkaTest {
     consumer.close();
   }
 
-  public static void main(String[] args) {
+  public void run() {
     String topic = "your-topic-name-1";
+
     createKafkaTopic(topic, 1, (short) 1);
     KafkaProducer<String, String> producer = createProducer();
     sendMessages(producer, topic);
